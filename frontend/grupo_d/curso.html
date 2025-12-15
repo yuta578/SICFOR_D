@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>SICFOR - Cursos</title>
+  <style>
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
+    body { margin: 0; background: #f5f6f8; }
+
+    /* NAVBAR */
+    .navbar {
+      height: 55px;
+      background: #ffffff;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      justify-content: space-between;
+    }
+    .nav-links { display: flex; gap: 20px; font-size: 14px; }
+    .nav-links span { cursor: pointer; color: #333; }
+    .profile { width: 32px; height: 32px; border-radius: 50%; background: #ddd; }
+
+    /* LAYOUT */
+    .container {
+      display: flex;
+      height: calc(100vh - 55px);
+      padding: 15px;
+      gap: 15px;
+    }
+
+    /* LEFT - CURSOS */
+    .courses {
+      width: 240px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 10px;
+      overflow-y: auto; /* SCROLL */
+    }
+    .courses h4 { margin: 5px 0 10px; font-size: 14px; }
+    .course-item {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      background: #fafafa;
+    }
+
+    /* RIGHT CONTENT */
+    .content { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+
+    .box {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 12px;
+    }
+
+    .box-2 {
+      display: flex;
+      cursor: pointer;
+      align-items: right;
+      justify-content: right;
+      padding-bottom: 10px;
+    }
+
+    .box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .actions button {
+      font-size: 12px;
+      padding: 4px 8px;
+      margin-left: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+
+    .add { border-color: #5cb85c; color: #5cb85c; }
+    .edit { border-color: #0275d8; color: #0275d8; }
+    .delete { border-color: #d9534f; color: #d9534f; }
+
+    /* INFO */
+    .info p { margin: 5px 0; font-size: 13px; }
+
+    /* LISTADO */
+    .table-container {
+      max-height: 200px; /* SCROLL ABAJO */
+      overflow-y: auto;
+      border: 1px solid #eee;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+
+    th { background: #f8f9fa; }
+
+    .remove { color: red; cursor: pointer; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <strong>SICFOR</strong>
+    <div class="nav-links">
+      <span>Estudiantes</span>
+      <span>Instructores</span>
+      <span>Cursos</span>
+      <span>Recursos</span>
+      <span>Pagos</span>
+      <span>Asistencias</span>
+      <span>Evaluaciones</span>
+      <span>Certificaciones</span>
+      <span>Soporte</span>
+    </div>
+    <div class="profile"></div>
+  </div>
+
+  <div class="container">
+
+    <!-- CURSOS -->
+    <div class="courses">
+      <h4>Cursos</h4>
+      <div class="course-item">Curso 1</div>
+      <div class="course-item">Curso 2</div>
+      <div class="course-item">Curso 3</div>
+      <div class="course-item">Curso 4</div>
+      <div class="course-item">Curso 5</div>
+      <div class="course-item">Curso 6</div>
+      <div class="course-item">Curso 7</div>
+      <div class="course-item">Curso 8</div>
+      <div class="course-item">Curso 9</div>
+      <div class="course-item">Curso 10</div>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div class="content">
+
+      <!-- DETALLES -->
+      <div class="box">
+        <div class="box-header">
+          <strong>Detalles del curso</strong>
+          <div class="actions">
+            <button class="add" onclick="window.location.href='curso_create.html'">
+  Añadir
+</button>
+
+<button class="edit" onclick="window.location.href='curso_edit.html'">
+  Editar
+</button>
+            <button class="delete">Eliminar</button>
+          </div>
+        </div>
+
+        <div class="info">
+          <p><strong>Título:</strong> —</p>
+          <p><strong>Descripción:</strong> —</p>
+          <p><strong>Duración:</strong> —</p>
+          <p><strong>Unidades de formación:</strong> —</p>
+          <p><strong>Modalidad:</strong> —</p>
+        </div>
+      </div>
+
+      <!-- LISTADO -->
+      <div class="box">
+        <strong>Listado</strong>
+
+        <div class="box-2">
+        <div class="actions">
+            <button class="add" onclick="window.location.href='curso_create.html'">
+  Añadir
+</button>
+</div>
+</div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nombre Completo</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>Estudiante</td><td class="remove">X</td></tr>
+              <tr><td>2</td><td>Estudiante</td><td class="remove">X</td></tr>
+              <tr><td>3</td><td>Estudiante</td><td class="remove">X</td></tr>
+              <tr><td>4</td><td>Estudiante</td><td class="remove">X</td></tr>
+              <tr><td>5</td><td>Estudiante</td><td class="remove">X</td></tr>
+              <tr><td>6</td><td>Estudiante</td><td class="remove">X</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // ====== DATOS SIMULADOS (luego se conecta al backend) ======
+    const cursos = {
+      "Curso 1": {
+        titulo: "Curso 1",
+        descripcion: "Introducción al curso 1",
+        duracion: "40 horas",
+        unidades: "unidad1, unidad2, unidad3, unidad4",
+        modalidad: "Virtual",
+        estudiantes: ["Juan Pérez", "Ana Gómez", "Carlos Ruiz"]
+      },
+      "Curso 2": {
+        titulo: "Curso 2",
+        descripcion: "Curso intermedio",
+        duracion: "60 horas",
+        unidades: "6",
+        modalidad: "Presencial",
+        estudiantes: ["Laura Díaz", "Miguel Torres"]
+      }
+    };
+
+    const courseItems = document.querySelectorAll('.course-item');
+    const info = document.querySelector('.info');
+    const tbody = document.querySelector('tbody');
+
+    courseItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const nombreCurso = item.textContent.trim();
+        const curso = cursos[nombreCurso];
+        if (!curso) return;
+
+        // Cargar información del curso
+        info.innerHTML = `
+          <p><strong>Título:</strong> ${curso.titulo}</p>
+          <p><strong>Descripción:</strong> ${curso.descripcion}</p>
+          <p><strong>Duración:</strong> ${curso.duracion}</p>
+          <p><strong>Unidades de formación:</strong> ${curso.unidades}</p>
+          <p><strong>Modalidad:</strong> ${curso.modalidad}</p>
+        `;
+
+        // Cargar estudiantes
+        tbody.innerHTML = '';
+        curso.estudiantes.forEach((est, i) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${i + 1}</td>
+            <td>${est}</td>
+            <td class="remove">X</td>
+          `;
+          tbody.appendChild(row);
+        });
+      });
+    });
+
+    // ====== EJEMPLO REAL CON BACKEND ======
+    /*
+    fetch('http://localhost:8080/api/cursos/1')
+      .then(res => res.json())
+      .then(data => {
+        // data.titulo
+        // data.descripcion
+        // data.estudiantes[]
+      });
+    */
+  </script>
+</body>
+</html>
