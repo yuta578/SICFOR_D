@@ -49,6 +49,11 @@
       background: #fafafa;
     }
 
+    .course-item.selected {
+      border-color: #0275d8;
+      background: #e9f4ff;
+    }
+
     /* RIGHT CONTENT */
     .content { flex: 1; display: flex; flex-direction: column; gap: 15px; }
 
@@ -135,18 +140,8 @@
   <div class="container">
 
     <!-- CURSOS -->
-    <div class="courses">
+    <div class="courses" id="courses">
       <h4>Cursos</h4>
-      <div class="course-item">Curso 1</div>
-      <div class="course-item">Curso 2</div>
-      <div class="course-item">Curso 3</div>
-      <div class="course-item">Curso 4</div>
-      <div class="course-item">Curso 5</div>
-      <div class="course-item">Curso 6</div>
-      <div class="course-item">Curso 7</div>
-      <div class="course-item">Curso 8</div>
-      <div class="course-item">Curso 9</div>
-      <div class="course-item">Curso 10</div>
     </div>
 
     <!-- CONTENIDO -->
@@ -186,6 +181,7 @@
             <button class="add" onclick="window.location.href='curso_create.html'">
   Añadir
 </button>
+
 </div>
 </div>
         <div class="table-container">
@@ -197,13 +193,9 @@
                 <th>Acciones</th>
               </tr>
             </thead>
-            <tbody>
-              <tr><td>1</td><td>Estudiante</td><td class="remove">X</td></tr>
-              <tr><td>2</td><td>Estudiante</td><td class="remove">X</td></tr>
-              <tr><td>3</td><td>Estudiante</td><td class="remove">X</td></tr>
-              <tr><td>4</td><td>Estudiante</td><td class="remove">X</td></tr>
-              <tr><td>5</td><td>Estudiante</td><td class="remove">X</td></tr>
-              <tr><td>6</td><td>Estudiante</td><td class="remove">X</td></tr>
+                  <!-- ESTUDIANTES -->
+            <tbody id="estudiantes">
+
             </tbody>
           </table>
         </div>
@@ -211,71 +203,127 @@
 
     </div>
   </div>
-
   <script>
-    // ====== DATOS SIMULADOS (luego se conecta al backend) ======
-    const cursos = {
-      "Curso 1": {
-        titulo: "Curso 1",
-        descripcion: "Introducción al curso 1",
-        duracion: "40 horas",
-        unidades: "unidad1, unidad2, unidad3, unidad4",
-        modalidad: "Virtual",
-        estudiantes: ["Juan Pérez", "Ana Gómez", "Carlos Ruiz"]
-      },
-      "Curso 2": {
-        titulo: "Curso 2",
-        descripcion: "Curso intermedio",
-        duracion: "60 horas",
-        unidades: "6",
-        modalidad: "Presencial",
-        estudiantes: ["Laura Díaz", "Miguel Torres"]
+    // Configura la URL del backend. Ajusta el puerto si es distinto.
+    const API = 'http://localhost:8080'
+    let estudiantes_inscritos = null
+
+    async function loadCursos() {
+      try {
+        const res = await fetch(`${API}/api/cursos`)
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const datos = await res.json()
+        renderCursos(datos)
+      } catch (err) {
+        console.error('Error cargando cursos:', err)
       }
-    };
+    }
 
-    const courseItems = document.querySelectorAll('.course-item');
-    const info = document.querySelector('.info');
-    const tbody = document.querySelector('tbody');
+    function renderCursos(cursos) {
+      const container = document.getElementById('courses')
+      if (!container) return
+      const listHtml = [
+        '<h4>Cursos</h4>',
+        ...cursos.map((curso) => {
+          const id = curso.id
+          const nombre = curso.titulo
+          return `<div class="course-item" data-curso-id="${id}">${nombre}</div>`
+        })
+      ].join('')
+      container.innerHTML = listHtml
 
-    courseItems.forEach(item => {
-      item.addEventListener('click', () => {
-        const nombreCurso = item.textContent.trim();
-        const curso = cursos[nombreCurso];
-        if (!curso) return;
+      // Selección de curso para mostrar detalles
+      container.querySelectorAll('.course-item').forEach(el => {
+        el.addEventListener('click', () => {
+          container.querySelectorAll('.course-item').forEach(x => x.classList.remove('selected'))
+          el.classList.add('selected')
+          const id = el.getAttribute('data-curso-id')
+          const curso = cursos.find(c => String(c.id) === String(id))
+          setDetalles(curso)
+          // Renderizar estudiantes inscritos del curso
+          loadEstudiantes().then(() => renderEstudiantesForCourse(id))
+        })
+      })
+    }
 
-        // Cargar información del curso
-        info.innerHTML = `
-          <p><strong>Título:</strong> ${curso.titulo}</p>
-          <p><strong>Descripción:</strong> ${curso.descripcion}</p>
-          <p><strong>Duración:</strong> ${curso.duracion}</p>
-          <p><strong>Unidades de formación:</strong> ${curso.unidades}</p>
-          <p><strong>Modalidad:</strong> ${curso.modalidad}</p>
-        `;
+    function setDetalles(curso) {
+      const info = document.querySelector('.info')
+      if (!info || !curso) return
+      const titulo = curso.titulo
+      const descripcion = curso.descripcion
+      const duracion = curso.duracion
+      const unidades = curso.unidades_formacion
+      const modalidad = curso.modalidad
+      info.innerHTML = `
+        <p><strong>Título:</strong> ${titulo}</p>
+        <p><strong>Descripción:</strong> ${descripcion}</p>
+        <p><strong>Duración:</strong> ${duracion}</p>
+        <p><strong>Unidades de formación:</strong> ${unidades}</p>
+        <p><strong>Modalidad:</strong> ${modalidad}</p>
+      `
+    }
 
-        // Cargar estudiantes
-        tbody.innerHTML = '';
-        curso.estudiantes.forEach((est, i) => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${i + 1}</td>
-            <td>${est}</td>
-            <td class="remove">X</td>
-          `;
-          tbody.appendChild(row);
-        });
-      });
-    });
+    // Eliminar curso seleccionado (usa el detalle actual)
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCursos()
+      loadEstudiantes()
+      const deleteBtn = document.querySelector('.actions .delete')
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', async () => {
+          const selected = document.querySelector('.course-item.selected')
+          const id = selected?.getAttribute('data-curso-id')
+          if (!id) { alert('Selecciona un curso de la lista'); return }
+          if (!confirm('¿Eliminar curso?')) return
+          try {
+            const res = await fetch(`${API}/api/cursos/${id}`, { method: 'DELETE' })
+            if (!res.ok) throw new Error(await res.text())
+            loadCursos()
+          } catch (err) {
+            alert('Error eliminando: ' + err.message)
+          }
+        })
+      }
+      })
 
-    // ====== EJEMPLO REAL CON BACKEND ======
-    /*
-    fetch('http://localhost:8080/api/cursos/1')
-      .then(res => res.json())
-      .then(data => {
-        // data.titulo
-        // data.descripcion
-        // data.estudiantes[]
-      });
-    */
+    async function loadEstudiantes() {
+      if (Array.isArray(estudiantes_inscritos)) return estudiantes_inscritos
+      try {
+        const res = await fetch(`${API}/api/estudiantes`)
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const datos = await res.json()
+        estudiantes_inscritos = Array.isArray(datos) ? datos : []
+      } catch (err) {
+        console.error('Error cargando estudiantes:', err)
+        estudiantes_inscritos = []
+      }
+      return estudiantes_inscritos
+    }
+
+    function getStudentCourseId(e) {
+      if (!e) return undefined
+      const curso = e.id_curso
+      return curso
+    }
+
+    function getStudentName(e) {
+      if (!e) return '—'
+      const nombres = e.nombres 
+      return nombres
+    }
+
+    function renderEstudiantesForCourse(cursoId) {
+      const tbody = document.getElementById('estudiantes')
+      if (!tbody) return
+      const list = (estudiantes_inscritos || []).filter(e => String(getStudentCourseId(e)) === String(cursoId))
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="3">Sin inscritos</td></tr>'
+        return
+      }
+      tbody.innerHTML = list.map((e, i) => {
+        const nombre = getStudentName(e)
+        return `<tr><td>${i + 1}</td><td>${nombre}</td><td class="remove" data-student-id="${e.id ?? ''}">X</td></tr>`
+      }).join('')
+    }
   </script>
 </body>
 </html>
