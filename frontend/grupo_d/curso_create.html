@@ -237,5 +237,63 @@ textarea.form-control {
             <button id="btnSubmit" type="submit" class="btn btn-primary">Guardar</button>
             </div>
     </main>
+
+    <script>
+      const API = 'http://localhost:8080'
+      const form = document.getElementById('cursoForm')
+      const btnSubmit = document.getElementById('btnSubmit')
+
+      btnSubmit.addEventListener('click', async (e) => {
+        e.preventDefault()
+        
+        // Obtener valores del formulario
+        const titulo = document.getElementById('titulo').value.trim()
+        const descripcion = document.getElementById('descripcion').value.trim()
+        const duracion = document.getElementById('duracion').value.trim()
+        const modalidad = document.getElementById('modalidad').value
+        const unidad1 = document.getElementById('unidad1').value.trim()
+        
+        // Validación básica
+        if (!titulo || !descripcion || !duracion) {
+          alert('Por favor complete todos los campos obligatorios')
+          return
+        }
+        
+        if (modalidad === ' -- seleccione una -- ') {
+          alert('Por favor seleccione una modalidad')
+          return
+        }
+        
+        // Preparar datos
+        const data = {
+          titulo,
+          descripcion,
+          duracion,
+          modalidad,
+          unidades_formacion: unidad1 || ''
+        }
+        
+        try {
+          const res = await fetch(`${API}/api/cursos`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          })
+          
+          if (!res.ok) {
+            const error = await res.json()
+            throw new Error(error.error || 'Error al crear curso')
+          }
+          
+          alert('Curso creado exitosamente')
+          window.location.href = 'curso.html'
+        } catch (err) {
+          console.error('Error:', err)
+          alert('Error al crear curso: ' + err.message)
+        }
+      })
+    </script>
   </body>
 </html>

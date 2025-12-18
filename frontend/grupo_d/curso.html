@@ -319,10 +319,30 @@
         tbody.innerHTML = '<tr><td colspan="3">Sin inscritos</td></tr>'
         return
       }
+      // e.id es el ID de la inscripción según tu API
       tbody.innerHTML = list.map((e, i) => {
         const nombre = getStudentName(e)
-        return `<tr><td>${i + 1}</td><td>${nombre}</td><td class="remove" data-student-id="${e.id ?? ''}">X</td></tr>`
+          // e.id es el ID de la inscripción devuelta por /api/estudiantes
+          return `<tr><td>${i + 1}</td><td>${nombre}</td><td class="remove" data-inscripcion-id="${e.id ?? ''}">X</td></tr>`
       }).join('')
+
+        // Eliminar inscripción usando DELETE /api/estudiantes/:id
+        tbody.querySelectorAll('.remove').forEach((cell) => {
+          cell.addEventListener('click', async () => {
+            const inscId = cell.getAttribute('data-inscripcion-id')
+            if (!inscId) { alert('No se encontró la inscripción'); return }
+            if (!confirm('¿Quitar estudiante de este curso?')) return
+            try {
+              const url = `${API}/api/estudiantes/${inscId}`
+              const res = await fetch(url, { method: 'DELETE' })
+              if (!res.ok) throw new Error(await res.text())
+              await loadEstudiantes()
+              renderEstudiantesForCourse(cursoId)
+            } catch (err) {
+              throw err
+            }
+          })
+        })
     }
   </script>
 </body>

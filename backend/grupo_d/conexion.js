@@ -6,6 +6,7 @@ const cors=require("cors")
 require('dotenv').config({ path: path.join(__dirname, '../../.env') })
 
 app.use(cors())
+app.use(express.json())
 
 // Servir archivos estáticos desde la carpeta frontend
 app.use(express.static(path.join(__dirname, '../../frontend/grupo_d')))
@@ -42,7 +43,8 @@ app.get('/api/cursos', (req, res) => {
     })
 })
 app.get('/api/estudiantes', (req, res) => {
-    const sql = 'SELECT i.*, e.nombres, c.titulo, c.id FROM inscripciones i JOIN cursos c ON i.id_curso = c.id jOIN estudiantes e ON i.id_estudiante = e.id'
+    // Lista inscripciones con datos del estudiante y curso
+    const sql = 'SELECT i.*, e.nombres, c.titulo FROM inscripciones i JOIN cursos c ON i.id_curso = c.id JOIN estudiantes e ON i.id_estudiante = e.id'
     conexion.query(sql, (error, results) => {
         if (error) {
             console.error('Error al obtener estudiantes:', error)
@@ -52,8 +54,35 @@ app.get('/api/estudiantes', (req, res) => {
     })
 })
 
+app.delete('/api/estudiantes/:id', (req, res) => {
+    const { id } = req.params
+    const sql = 'DELETE FROM inscripciones WHERE id = ?'
+    conexion.query(sql, [id], (error, result) => {
+        if (error) {
+            console.error('Error al eliminar inscripción:', error)
+            return res.status(500).json({ error: 'Error al eliminar inscripción' })
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Inscripción no encontrada' })
+        }
+        res.json({ success: true })
+    })
+})
+
+app.post('/api/cursos', (req, res) => {
+    const { titulo, descripcion, duracion, modalidad, unidades_formacion } = req.body
+    const sql = 'INSERT INTO cursos (titulo, descripcion, duracion, modalidad, unidades_formacion) VALUES (?, ?, ?, ?, ?)'
+    conexion.query(sql, [titulo, descripcion, duracion, modalidad, unidades_formacion], (error, result) => {
+        if (error) {
+            console.error('Error al crear curso:', error)
+            return res.status(500).json({ error: 'Error al crear curso' })
+        }
+        res.json({ id: result.insertId, titulo, descripcion, duracion, modalidad, unidades_formacion })
+    })
+})
+
 // Iniciar servidor
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 8080
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en puerto ${PORT}`)
 })
